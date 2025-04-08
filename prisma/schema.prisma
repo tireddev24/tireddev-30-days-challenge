@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id         String      @id @default(uuid())
+  username   String
+  firstname  String
+  lastname   String
+  role       Role        @default(USER)
+  email      String      @unique
+  password   String
+  isVerified Boolean?
+  course     String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  posts      posts[]
+  likes      likes[]
+  otp        otp?
+  follower   followers[] @relation("follower")
+  following  followers[] @relation("following")
+  dislikes   dislikes[]
+}
+
+model followers {
+  id          String   @id @default(uuid())
+  follower    Users?   @relation("follower", fields: [followerId], references: [id])
+  following   Users?   @relation("following", fields: [followingId], references: [id])
+  createdAt   DateTime @default(now())
+  followingId String?
+  followerId  String?
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model posts {
+  id        String     @id @default(uuid())
+  title     String
+  body      String
+  user      Users      @relation(fields: [usersId], references: [id])
+  status    String
+  mediaLink String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  usersId   String
+  likes     likes[]
+  dislikes  dislikes[]
+  Category  Category[]
+}
+
+model Category {
+  id    String  @id @default(uuid())
+  posts posts[]
+}
+
+model likes {
+  id      String @id @default(uuid())
+  postid  posts  @relation(fields: [postsId], references: [id])
+  user    Users  @relation(fields: [usersId], references: [id])
+  userid  String
+  postsId String
+  usersId String
+}
+
+model otp {
+  id         String   @id @default(uuid())
+  otp        String
+  user       Users    @relation(fields: [usersId], references: [id])
+  expiryTime DateTime
+  createdAt  DateTime @default(now())
+  usersId    String   @unique
+}
+
+model dislikes {
+  id      String @id @default(uuid())
+  post    posts  @relation(fields: [postsId], references: [id])
+  user    Users  @relation(fields: [usersId], references: [id])
+  postsId String
+  usersId String
+}
