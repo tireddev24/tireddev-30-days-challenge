@@ -4,6 +4,8 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+//prisma migrate dev --name init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -16,8 +18,8 @@ datasource db {
 model Users {
   id         String      @id @default(uuid())
   username   String      @unique
-  firstname  String
-  lastname   String
+  firstname  String?
+  lastname   String?
   role       Role        @default(USER)
   email      String      @unique
   password   String
@@ -34,12 +36,13 @@ model Users {
 }
 
 model followers {
-  id          String   @id @default(uuid())
-  follower    Users?   @relation("follower", fields: [followerId], references: [id])
-  following   Users?   @relation("following", fields: [followingId], references: [id])
+  follower    Users    @relation("follower", fields: [followerId], references: [id])
+  following   Users    @relation("following", fields: [followingId], references: [id])
   createdAt   DateTime @default(now())
-  followingId String?
-  followerId  String?
+  followingId String
+  followerId  String
+
+  @@id([followerId, followingId])
 }
 
 enum Role {
@@ -77,12 +80,12 @@ model likes {
 }
 
 model otp {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   otp        String
-  user       Users    @relation(fields: [usersId], references: [id])
-  expiryTime DateTime
-  createdAt  DateTime @default(now())
-  usersId    String   @unique
+  user       Users     @relation(fields: [usersId], references: [id])
+  expiryTime DateTime?
+  createdAt  DateTime  @default(now())
+  usersId    String    @unique
 }
 
 model dislikes {
