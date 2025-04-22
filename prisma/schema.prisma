@@ -15,6 +15,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  DELETED
+}
+
 model Users {
   id         String      @id @default(uuid())
   username   String      @unique
@@ -45,18 +56,13 @@ model followers {
   @@id([followerId, followingId])
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
 model posts {
   id        String     @id @default(uuid())
   title     String
-  body      String
-  user      Users      @relation(fields: [usersId], references: [id])
-  status    String
-  mediaLink String
+  body      String?
+  author    Users      @relation(fields: [usersId], references: [id])
+  status    PostStatus @default(DRAFT)
+  mediaLink String?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   usersId   String
@@ -72,9 +78,8 @@ model Category {
 
 model likes {
   id      String @id @default(uuid())
-  postid  posts  @relation(fields: [postsId], references: [id])
+  post    posts  @relation(fields: [postsId], references: [id])
   user    Users  @relation(fields: [usersId], references: [id])
-  userid  String
   postsId String
   usersId String
 }

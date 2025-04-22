@@ -1,29 +1,34 @@
 import { Request, Response } from "express";
 import { hashSync } from "bcrypt";
-import * as jwt from "jsonwebtoken";
+import { sign } from "jsonwebtoken";
 import { PrismaClient, PrismaPromise, otp } from "@prisma/client";
 import { JWT_SECRET } from "../secrets";
 import { createOtp } from "../utils/helpers";
+import { login } from "./auth.controller";
 const prisma = new PrismaClient();
 
-export const signup = async (req: Request, res: Response) => {
-  const { password: user_password, email } = req.body;
+export const signup = async (req: Request, res: Response): Promise<void> => {
+  const { password: userPassword, email } = req.body;
 
   try {
-    const UserExists = await prisma.users.findFirst({
+    const userExists = await prisma.users.findFirst({
       where: { email: email },
     });
 
-    if (UserExists) {
+    if (userExists) {
       res.status(404).json({ success: false, message: "User already exist" });
     }
 
     const user = await prisma.users.create({
-      data: { ...req.body, password: hashSync(user_password, 10) },
+      data: { ...req.body, password: hashSync(userPassword, 10) },
     });
 
     const { password, ...userData } = user;
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+    const token = sign({ id: user.id, email: user.email }, JWT_SECRET, {
+      expiresIn: "300s",
+    });
+
+    login;
 
     const otp: string = createOtp();
     await prisma.otp.create({
@@ -48,7 +53,7 @@ export const signup = async (req: Request, res: Response) => {
   }
 };
 
-export const getUsers = async (req: Request, res: Response) => {
+export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await prisma.users.findMany();
     res.status(302).json(users);
@@ -62,6 +67,15 @@ export const deleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
+    const otpExists = await prisma.otp.findUnique({
+      where: { usersId: id },
+    });
+    if (otpExists) {
+      await prisma.otp.delete({
+        where: { usersId: id },
+      });
+    }
+
     const user = await prisma.users.delete({
       where: { id: id },
     });
@@ -76,7 +90,10 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { id } = req.params;
 
   try {
@@ -99,11 +116,25 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-export const verifyEmail = async (req: Request, res: Response) => {
+export const verifyEmail = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { id } = req.params;
   const { otp } = req.body;
 
   try {
+    const isVerified = await prisma.users.findUnique({
+      where: { id: id },
+    });
+    if (isVerified?.isVerified) {
+      res.status(400).json({
+        success: false,
+        message: "Email already verified",
+      });
+      return;
+    }
+
     const match = await prisma.otp.findUnique({
       where: { usersId: id, expiryTime: { gte: new Date() } },
     });
