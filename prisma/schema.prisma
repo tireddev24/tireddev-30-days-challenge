@@ -47,11 +47,11 @@ model Users {
 }
 
 model followers {
-  follower    Users    @relation("follower", fields: [followerId], references: [id])
-  following   Users    @relation("following", fields: [followingId], references: [id])
-  createdAt   DateTime @default(now())
-  followingId String
+  follower    Users    @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   Users    @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
   followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
 
   @@id([followerId, followingId])
 }
@@ -60,7 +60,7 @@ model posts {
   id        String     @id @default(uuid())
   title     String
   body      String?
-  author    Users      @relation(fields: [usersId], references: [id])
+  author    Users      @relation(fields: [usersId], references: [id], onDelete: Cascade)
   status    PostStatus @default(DRAFT)
   mediaLink String?
   createdAt DateTime   @default(now())
@@ -78,8 +78,8 @@ model Category {
 
 model likes {
   id      String @id @default(uuid())
-  post    posts  @relation(fields: [postsId], references: [id])
-  user    Users  @relation(fields: [usersId], references: [id])
+  post    posts  @relation(fields: [postsId], references: [id], onDelete: Cascade)
+  user    Users  @relation(fields: [usersId], references: [id], onDelete: Cascade)
   postsId String
   usersId String
 }
@@ -87,7 +87,7 @@ model likes {
 model otp {
   id         String    @id @default(uuid())
   otp        String
-  user       Users     @relation(fields: [usersId], references: [id])
+  user       Users     @relation(fields: [usersId], references: [id], onDelete: Cascade)
   expiryTime DateTime?
   createdAt  DateTime  @default(now())
   usersId    String    @unique
@@ -95,8 +95,8 @@ model otp {
 
 model dislikes {
   id      String @id @default(uuid())
-  post    posts  @relation(fields: [postsId], references: [id])
-  user    Users  @relation(fields: [usersId], references: [id])
+  post    posts  @relation(fields: [postsId], references: [id], onDelete: Cascade)
+  user    Users  @relation(fields: [usersId], references: [id], onDelete: Cascade)
   postsId String
   usersId String
 }

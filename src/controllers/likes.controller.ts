@@ -100,3 +100,54 @@ export const unlikePost = async (
     return;
   }
 };
+
+export const dislikePost = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { id } = req.user!;
+  const postId = req.params.id;
+
+  try {
+    const post = await prisma.posts.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      res.status(404).json({ success: false, message: "Post not found" });
+      return;
+    }
+
+    const existingDislike = await prisma.dislikes.findFirst({
+      where: {
+        usersId: id,
+        postsId: postId,
+      },
+    });
+
+    if (existingDislike) {
+      res.status(400).json({
+        success: false,
+        message: "You have already disliked this post",
+      });
+      return;
+    }
+
+    await prisma.dislikes.create({
+      data: {
+        usersId: id,
+        postsId: postId,
+      },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "You disliked this post.",
+    });
+    return;
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+    return;
+  }
+};

@@ -26,7 +26,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     const { password, ...userData } = user;
     const token = sign({ id: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "600s",
+      expiresIn: "84000s",
     });
 
     res.status(200).json({

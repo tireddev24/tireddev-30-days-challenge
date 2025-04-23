@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient, PostStatus } from "@prisma/client";
+import { link } from "fs";
 
 const prisma = new PrismaClient();
 
@@ -45,6 +46,7 @@ export const getUsersPosts = async (
       include: {
         author: true,
         likes: true,
+        dislikes: true,
       },
     });
     if (!post) {
@@ -56,10 +58,13 @@ export const getUsersPosts = async (
     res.status(200).json({
       success: true,
       message: "Post(s) retrieved successfully",
-      post: {
-        ...post,
-        likesCount: post.reduce((total, p) => total + p.likes.length, 0),
-      },
+      post: post
+        .map((post) => ({
+          ...post,
+          likesCount: post.likes.length,
+          dislikesCount: post.dislikes.length,
+        }))
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
     });
     return;
   } catch (error: any) {
@@ -75,6 +80,7 @@ export const getPosts = async (req: Request, res: Response): Promise<void> => {
       include: {
         author: true,
         likes: true,
+        dislikes: true,
       },
     });
     if (!posts) {
@@ -84,10 +90,13 @@ export const getPosts = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({
       success: true,
       message: "Posts retrieved successfully",
-      posts: posts.map((post) => ({
-        ...post,
-        likesCount: post.likes.length,
-      })),
+      posts: posts
+        .map((post) => ({
+          ...post,
+          likesCount: post.likes.length,
+          dislikesCount: post.dislikes.length,
+        }))
+        .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
     });
     return;
   } catch (error: any) {
@@ -148,6 +157,32 @@ export const deletePost = async (
     res.status(200).json({
       success: true,
       message: "Post deleted successfully",
+      post,
+    });
+    return;
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+    return;
+  }
+};
+
+export const sharePost = async (req: Request, res: Response): Promise<void> => {
+  const postId = req.params.id;
+
+  try {
+    const post = await prisma.posts.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      res.status(404).json({ success: false, message: "Post not found" });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Gotten Shared Post",
       post,
     });
     return;

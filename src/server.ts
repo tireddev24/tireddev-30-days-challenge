@@ -3,20 +3,23 @@ import { PORT } from "./secrets";
 import router from "./routers/router";
 import cors from "cors";
 import morgan from "morgan";
+import { checkIp } from "./utils/whitelist";
 
 const app: Express = express();
 
-// app.use();
+// Middleware
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
+
+// Middleware to check IP address
+app.use(checkIp);
+
+//App Routes
 app.use("/api", router);
 
-//
-
 app.get("/", (req: Request, res: Response): void => {
-  console.log("DAYS OF CODE CHALLENGE");
-  res.send("Welcome to TIREDDEV 30 DAYS OF CODE CHALLENGE");
+  res.send("Welcome to TIREDDEV 30 DAYS OF CODE CHALLENGE ");
 });
 
 app.listen(PORT, () => {
