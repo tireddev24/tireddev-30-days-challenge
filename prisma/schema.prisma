@@ -8,6 +8,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "./node_modules/.prisma/client"
 }
 
 datasource db {
@@ -44,6 +45,7 @@ model Users {
   follower   followers[] @relation("follower")
   following  followers[] @relation("following")
   dislikes   dislikes[]
+  comments   comments[]
 }
 
 model followers {
@@ -68,10 +70,11 @@ model posts {
   usersId   String
   likes     likes[]
   dislikes  dislikes[]
-  Category  Category[]
+  Category  category[]
+  comments  comments[]
 }
 
-model Category {
+model category {
   id    String  @id @default(uuid())
   posts posts[]
 }
@@ -81,6 +84,15 @@ model likes {
   post    posts  @relation(fields: [postsId], references: [id], onDelete: Cascade)
   user    Users  @relation(fields: [usersId], references: [id], onDelete: Cascade)
   postsId String
+  usersId String
+}
+
+model comments {
+  id      String @id @default(uuid())
+  content String
+  post    posts  @relation(fields: [postsId], references: [id])
+  postsId String
+  user    Users  @relation(fields: [usersId], references: [id])
   usersId String
 }
 
