@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { login } from "../controllers/auth.controller";
-
+import { login, logout } from "../controllers/auth.controller";
+import { loginLimit } from "../utils/limits";
+import { verifyJWT } from "../middlewares/auth";
 const authRoutes: Router = Router();
 
-authRoutes.post("/login", login);
+authRoutes.post("/login", loginLimit, login);
+
+authRoutes.post("/logout", verifyJWT, logout);
 
 export default authRoutes;

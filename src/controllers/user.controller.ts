@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { hashSync } from "bcrypt";
+import { hash } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { PrismaClient, PrismaPromise, otp } from "@prisma/client";
 import { JWT_SECRET } from "../secrets";
@@ -16,21 +16,22 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     });
 
     if (userExists) {
-      res.status(404).json({ success: false, message: "User already exist" });
+      res.status(400).json({ success: false, message: "User already exists" });
+      return;
     }
 
     const user = await prisma.users.create({
-      data: { ...req.body, password: hashSync(userPassword, 10) },
+      data: { ...req.body, password: hash(userPassword, 10) },
     });
 
     const { password, ...userData } = user;
     const token = sign({ id: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "300s",
+      expiresIn: "1h",
     });
 
-    login;
-
+    //create otp after user signs up
     const otp: string = createOtp();
+
     await prisma.otp.create({
       data: {
         otp: otp,
@@ -39,20 +40,22 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
       },
     });
 
+    sendMail(user.email, otp); //send otp to users mail
+
     res.status(201).json({
       success: true,
       message: "User Signed up successfully!",
-      userData,
+      user: userData,
       token,
     });
 
-    sendMail(user.email, otp);
     return;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
     res
       .status(500)
       .json({ success: false, message: "Server Error: Unable to signup user" });
+    return;
   }
 };
 
@@ -77,8 +80,9 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
     });
     return;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });
+    return;
   }
 };
 
@@ -105,9 +109,11 @@ export const getUserInfo = async (
         followingCount: user.follower.length,
       },
     });
+    return;
   } catch (error: any) {
     console.log(error);
     res.status(500).json({ success: false, message: "Server Error" });
+    return;
   }
 };
 
@@ -132,9 +138,11 @@ export const deleteUser = async (req: Request, res: Response) => {
       message: "User deleted successfully",
       user,
     });
+    return;
   } catch (error: any) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server Error" });
+    return;
   }
 };
 
@@ -208,11 +216,13 @@ export const verifyEmail = async (
     res
       .status(200)
       .json({ success: true, message: "Email successfully verified" });
+    return;
   } catch (error: any) {
-    console.log(error);
+    console.error(error);
     res
       .status(500)
       .json({ success: false, message: "Server Error: Unable to verify otp" });
+    return;
   }
 };
 
@@ -241,5 +251,10 @@ export const generateOtp = async (req: Request, res: Response) => {
       success: true,
       message: "OTP generated successfully",
     });
-  } catch (error) {}
+    return;
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+    return;
+  }
 };

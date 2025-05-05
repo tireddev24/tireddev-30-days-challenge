@@ -11,6 +11,8 @@ import { verifyJWT } from "../middlewares/auth";
 
 const router: Router = Router();
 
+router.get("/share/:id", sharePost);
+
 router.use(verifyJWT);
 
 router.post("/addlike/:id", likePost);
@@ -18,8 +20,6 @@ router.post("/addlike/:id", likePost);
 router.post("/unlike/:id", unlikePost);
 
 router.post("/dislike/:id", dislikePost);
-
-router.get("/share/:id", sharePost);
 
 router.post("/addcomment/:id", addComment);
 

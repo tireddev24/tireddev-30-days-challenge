@@ -9,16 +9,17 @@ import {
 
 import postActionsRoutes from "./postactions.route";
 import { verifyJWT } from "../middlewares/auth";
+import { postLimit } from "../utils/limits";
 
 const router: Router = Router();
 
-router.use(verifyJWT);
-
 router.get("/getall", getPosts);
 
-router.get("/getusersposts", getUsersPosts);
+router.post("/createpost", postLimit, verifyJWT, createPost);
 
-router.post("/createpost", createPost);
+router.use(verifyJWT);
+
+router.get("/getusersposts", getUsersPosts);
 
 router.put("/updatepost/:id", updatePost);
 

@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import { PORT } from "./secrets";
 import router from "./routers/router";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
 import { checkIp } from "./utils/whitelist";
@@ -10,6 +11,7 @@ const app: Express = express();
 // Middleware
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 
 // Middleware to check IP address

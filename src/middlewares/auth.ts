@@ -20,12 +20,12 @@ export const verifyJWT = (
   res: Response,
   next: NextFunction
 ): void => {
-  if (!req.headers.authorization) {
-    res.status(401).json({ message: "No Authorization Header Found" });
+  if (!req.cookies.tk) {
+    res.status(401).json({ message: "No Token Found" });
     return;
   }
 
-  const token = req.headers.authorization.split(" ")[1];
+  const token = req.cookies.tk;
   if (!token) {
     res.status(401).json({ message: "No Token Found" });
     return;
