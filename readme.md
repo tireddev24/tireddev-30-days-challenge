@@ -1,4 +1,4 @@
-# 📱 Social Media Backend API
+# 📱 Social Media Backend 
 
 A TypeScript-based RESTful backend for a social media application, built with Node.js, Express, Prisma ORM, and PostgreSQL.
 
@@ -8,7 +8,7 @@ A TypeScript-based RESTful backend for a social media application, built with No
 
 - 🔐 JWT authentication
 - 🧑 User registration and login
-- 📝 Post creation, editing, sharing and deletion
+- 📝 Post creation, editing, sharing, and deletion
 - ❤️ Likes on post and comments
 - 👥 Follow/unfollow users
 - 📊 Prisma for type-safe database access
