@@ -13,19 +13,18 @@ A TypeScript-based RESTful backend for a social media application, built with No
 - 👥 Follow/unfollow users
 - 📊 Prisma for type-safe database access
 
----
 
-## 🛠️ Tech Stack
+### 🎛️ Tech Stack
 
 - **Node.js** with **TypeScript**
 - **Express.js**
 - **Prisma ORM**
 - **PostgreSQL**
-- **JWT** for auth
+- **JWT** 
 
 ---
 
-### HOW TO USE THIS REPO 🛠️
+### 🛠️ HOW TO USE THIS REPO 
 
 STEP 1: Clone the project.
 
@@ -51,17 +50,15 @@ STEP 3: Configure Environment Variables
 1. In the root folder, create a file named ".env" and add the following to the file:
 
    ```bash
+    PORT = {{your_specified_port}}
 
-   PORT = {{your_specified_port}}
-   ```
+    DATABASE_URL = {{your_postgres_db_connection string}}
+    JWT_SECRET = {{your_jwt_secret}}
 
+    IP1 = ::{{your_current_ip_ddress}}
+    IP2 = ::{{any_other_preferred_ip_address}}
 
-    DATABASE_URL="{{your_postgres_db_connection string}}"
-    JWT_SECRET={{your_jwt_secret}}
-    IP1=::{{your_current_ip_ddress}}
-    IP2=::{{any_other_preferred_ip_address}}
-
-       ```
+    ```
 
 STEP 4: Run The Development Server
 
@@ -71,34 +68,32 @@ STEP 4: Run The Development Server
    npm start
 ```
 
-- Access the application in your browser with the URL provided in your terminal
-  Typically, the URL will be `http://localhost:3000`
-
-### 📝 THINGS TO NOTE
-
-- You need a stable internet connection to successfully clone the repo and install dependencies
-- You need to have PostgreSQL installed
+---
 
 ## 📁 Project Structure
 
 src/
-├── controllers/ // Route handlers
-├── middlewares/ // Authentication
-├── routers/ // Express routers
-├── prisma/ // Prisma schema & client
-├── utils/s // Helper functions
-└── server.ts // App entry point
+- ├── controllers/ // Route handlers
+- ├── middlewares/ // Authentication
+- ├── routers/ // Express routers
+- ├── prisma/ // Prisma schema & client
+- ├── utils/ // Helper functions
+- ├── secrets.ts/ // Environment variables initialization
+- └── server.ts // App entry point
 
 ## 📬 API Endpoints
 
-**Auth**
+**AUTH**
+
 POST /api/auth/signup — Register a user
 
 POST /api/auth/login — Login and receive JWT
 
 POST /api/auth/logout - Logout
 
-**Users**
+
+**USERS**
+
 GET /api/users/:id — Get user profile
 
 PUT /api/users/:id — Update user
@@ -107,12 +102,14 @@ PUT /api/users/:id/follow — Follow user
 
 PUT /api/users/:id/unfollow — Unfollow user
 
-**Posts**
+
+**POSTS**
+
 GET /api/post/:id — Fetch a post
 
 GET /api/post/getall - Fetch all posts
 
-GET /api/post/getuserspost - Get all posts for logged in user
+GET /api/post/getuserspost - Get all posts for logged-in user
 
 POST /api/post/createpost — Create a new post
 
@@ -120,7 +117,8 @@ PUT /api/post/updatepost/:id — Update a post
 
 DELETE /api/post/deletepost/:id — Delete a post
 
-**Post Actions**
+
+**POST ACTIONS**
 
 POST /api/post/actions/addlike/:id — Like a post
 
@@ -128,11 +126,12 @@ POST /api/post/actions/unlike/:id — Unlike a post
 
 POST /api/post/actions/dislike/:id — Dislike a post
 
-POST /api/post/actions/addcomment/:id - Add Comment
+POST /api/post/actions/addcomment/:id - Add a Comment
 
-POST /api/post/actions/deletecomment/:id - Delete Comment
+POST /api/post/actions/deletecomment/:id - Delete a Comment
 
-**Follow / Unfollow**
+
+**FOLLOW / UNFOLLOW**
 
 POST /api/follow/followuser/:id - Follow a user
 
@@ -144,13 +143,12 @@ You can test the API using:
 
 Postman
 
-## 🛡️ Security Notes
+### 📝 THINGS TO NOTE
 
-Passwords are hashed using bcrypt
-
-JWT tokens are stored client-side ( HTTP-only cookies )
-
-Rate limiting is recommended for production
+- You need a stable internet connection to successfully clone the repo and install dependencies
+- You need to have PostgreSQL installed
+- Passwords are hashed using bcrypt
+- JWT tokens are stored client-side ( HTTP-only cookies )
 
 ## 👨‍💻 Author
 
