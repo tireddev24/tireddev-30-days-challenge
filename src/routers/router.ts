@@ -2,7 +2,6 @@ import { Router } from "express";
 import authRoutes from "./auth.route";
 import userRoutes from "./user.route";
 import postRoutes from "./post.route";
-import postActionsRoutes from "./postactions.route";
 import followRoutes from "./follower.route";
 const router: Router = Router();
 

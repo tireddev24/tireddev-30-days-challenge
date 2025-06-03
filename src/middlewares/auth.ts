@@ -20,11 +20,6 @@ export const verifyJWT = (
   res: Response,
   next: NextFunction
 ): void => {
-  if (!req.cookies.tk) {
-    res.status(401).json({ message: "No Token Found" });
-    return;
-  }
-
   const token = req.cookies.tk;
   if (!token) {
     res.status(401).json({ message: "No Token Found" });

@@ -1,24 +1,11 @@
-import express, { Express, Request, Response } from "express";
+import { Request, Response } from "express";
 import { PORT } from "./secrets";
-import router from "./routers/router";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import morgan from "morgan";
-import { checkIp } from "./utils/whitelist";
+import { PrismaClient } from "@prisma/client";
+import createApp from "./app";
 
-const app: Express = express();
+export const prisma = new PrismaClient();
 
-// Middleware
-app.use(morgan("dev"));
-app.use(express.json());
-app.use(cookieParser());
-app.use(cors());
-
-// Middleware to check IP address
-app.use(checkIp);
-
-//App Routes
-app.use("/api", router);
+const app = createApp();
 
 app.get("/", (req: Request, res: Response): void => {
   res.send("Welcome to TIREDDEV 30 DAYS OF CODE CHALLENGE ");

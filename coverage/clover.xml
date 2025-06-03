@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1747058317065" clover="3.2.0">
+  <project timestamp="1747058317065" name="All files">
+    <metrics statements="13" coveredstatements="13" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3" elements="16" coveredelements="16" complexity="0" loc="13" ncloc="13" packages="1" files="1" classes="1"/>
+    <file name="helpers.ts" path="C:\Users\ThisdevlsTired\Desktop\Projects\30 days code challenge\tireddev-30-days-challenge\src\utils\helpers.ts">
+      <metrics statements="13" coveredstatements="13" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+      <line num="1" count="1" type="stmt"/>
+      <line num="3" count="1" type="stmt"/>
+      <line num="4" count="4" type="stmt"/>
+      <line num="5" count="4" type="stmt"/>
+      <line num="6" count="4" type="stmt"/>
+      <line num="7" count="24" type="stmt"/>
+      <line num="8" count="24" type="stmt"/>
+      <line num="10" count="4" type="stmt"/>
+      <line num="13" count="1" type="stmt"/>
+      <line num="14" count="2" type="stmt"/>
+      <line num="26" count="2" type="stmt"/>
+      <line num="34" count="1" type="stmt"/>
+      <line num="37" count="2" type="stmt"/>
+    </file>
+  </project>
+</coverage>

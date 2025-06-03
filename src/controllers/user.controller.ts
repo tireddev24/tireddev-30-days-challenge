@@ -1,63 +1,6 @@
 import { Request, Response } from "express";
-import { hash } from "bcrypt";
-import { sign } from "jsonwebtoken";
-import { PrismaClient, PrismaPromise, otp } from "@prisma/client";
-import { JWT_SECRET } from "../secrets";
-import { createOtp, sendMail } from "../utils/helpers";
-import { login } from "./auth.controller";
-const prisma = new PrismaClient();
-
-export const signup = async (req: Request, res: Response): Promise<void> => {
-  const { password: userPassword, email } = req.body;
-
-  try {
-    const userExists = await prisma.users.findFirst({
-      where: { email: email },
-    });
-
-    if (userExists) {
-      res.status(400).json({ success: false, message: "User already exists" });
-      return;
-    }
-
-    const user = await prisma.users.create({
-      data: { ...req.body, password: hash(userPassword, 10) },
-    });
-
-    const { password, ...userData } = user;
-    const token = sign({ id: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    //create otp after user signs up
-    const otp: string = createOtp();
-
-    await prisma.otp.create({
-      data: {
-        otp: otp,
-        usersId: user.id,
-        expiryTime: new Date(Date.now() + 10 * 60 * 1000),
-      },
-    });
-
-    sendMail(user.email, otp); //send otp to users mail
-
-    res.status(201).json({
-      success: true,
-      message: "User Signed up successfully!",
-      user: userData,
-      token,
-    });
-
-    return;
-  } catch (error: any) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ success: false, message: "Server Error: Unable to signup user" });
-    return;
-  }
-};
+import { prisma } from "../server";
+import { createOtp } from "../utils/helpers";
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {

@@ -1,16 +1,69 @@
 import { Request, Response } from "express";
-import { compare } from "bcrypt";
+import { compareSync, hash } from "bcrypt";
 import { sign } from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import { JWT_SECRET } from "../secrets";
+import { createOtp, sendMail } from "../utils/helpers";
 
 const prisma = new PrismaClient();
+
+export const signup = async (req: Request, res: Response): Promise<void> => {
+  const { password: userPassword, email } = req.body;
+
+  try {
+    const userExists = await prisma.users.findFirst({
+      where: { email: email },
+    });
+
+    if (userExists) {
+      res.status(400).json({ success: false, message: "User already exists" });
+      return;
+    }
+
+    const user = await prisma.users.create({
+      data: { ...req.body, password: hash(userPassword, 10) },
+    });
+
+    const { password, ...userData } = user;
+    const token = sign({ id: user.id, email: user.email }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    //create otp after user signs up
+    const otp: string = createOtp();
+
+    await prisma.otp.create({
+      data: {
+        otp: otp,
+        usersId: user.id,
+        expiryTime: new Date(Date.now() + 10 * 60 * 1000),
+      },
+    });
+
+    sendMail(user.email, otp); //send otp to users mail
+
+    res.status(201).json({
+      success: true,
+      message: "User Signed up successfully!",
+      user: userData,
+      token,
+    });
+
+    return;
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error: Unable to signup user" });
+    return;
+  }
+};
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   const { email: userEmail, password: userPassword } = req.body;
 
   try {
-    const user = await prisma.users.findFirst({
+    const user = await prisma.users.findUnique({
       where: { email: userEmail },
     });
 
@@ -19,7 +72,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (!compare(userPassword, user.password)) {
+    if (!compareSync(userPassword, user.password)) {
       res.status(400).json({ success: false, message: "Invalid Credentials" });
       return;
     }

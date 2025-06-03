@@ -1,6 +1,5 @@
 import { Router } from "express";
 import {
-  signup,
   getUsers,
   deleteUser,
   updateUser,
@@ -11,8 +10,6 @@ import {
 import { verifyJWT } from "../middlewares/auth";
 
 const router: Router = Router();
-
-router.post("/signup", signup);
 
 router.get("/getusers", getUsers);
 
