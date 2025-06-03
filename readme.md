@@ -25,6 +25,60 @@ A TypeScript-based RESTful backend for a social media application, built with No
 
 ---
 
+### HOW TO USE THIS REPO 🛠️
+
+STEP 1: Clone the project.
+
+1.  Launch your terminal and navigate to the directory where you want to store the project (e.g., cd Documents/Projects).
+2.  Paste the code below in your terminal
+
+```bash
+ git clone https://github.com/tireddev24/tireddev-30-days-challenge
+```
+
+STEP 2: Install Dependencies
+
+1. Navigate into the `tireddev-30-days-challenge` folder that was just created and run:
+
+```bash
+  npm install
+```
+
+2. This installs all dependencies included in the `package.json` file
+
+STEP 3: Configure Environment Variables
+
+1. In the root folder, create a file named ".env" and add the following to the file:
+
+   ```bash
+
+   PORT = {{your_specified_port}}
+   ```
+
+
+    DATABASE_URL="{{your_postgres_db_connection string}}"
+    JWT_SECRET={{your_jwt_secret}}
+    IP1=::{{your_current_ip_ddress}}
+    IP2=::{{any_other_preferred_ip_address}}
+
+       ```
+
+STEP 4: Run The Development Server
+
+- Use this command to start the development server:
+
+```bash
+   npm start
+```
+
+- Access the application in your browser with the URL provided in your terminal
+  Typically, the URL will be `http://localhost:3000`
+
+### 📝 THINGS TO NOTE
+
+- You need a stable internet connection to successfully clone the repo and install dependencies
+- You need to have PostgreSQL installed
+
 ## 📁 Project Structure
 
 src/
