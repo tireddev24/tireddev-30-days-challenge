@@ -1,17 +1,17 @@
 {
-  "compilerOptions": {
-    /* Language and Environment */
-    "target": "ES2024",
+    "compilerOptions": {
+        /* Language and Environment */
+        "target": "ES2024",
 
-    "module": "commonjs",
-    "esModuleInterop": true,
+        "module": "commonjs",
+        "esModuleInterop": true,
 
-    "forceConsistentCasingInFileNames": true,
+        "forceConsistentCasingInFileNames": true,
 
-    /* Type Checking */
-    "strict": true,
-    "skipLibCheck": true
-  },
-  "include": ["./src/**/*", "__tests__"],
-  "exclude": ["node_modules"]
+        /* Type Checking */
+        "strict": true,
+        "skipLibCheck": true
+    },
+    "include": ["./src/**/*", "__tests__"],
+    "exclude": ["node_modules"]
 }

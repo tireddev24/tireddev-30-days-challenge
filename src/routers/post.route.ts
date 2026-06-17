@@ -1,10 +1,10 @@
 import { Router } from "express";
 import {
-  createPost,
-  deletePost,
-  getPosts,
-  getUsersPosts,
-  updatePost,
+    createPost,
+    deletePost,
+    getPosts,
+    getUsersPosts,
+    updatePost,
 } from "../controllers/post.controller";
 
 import postActionsRoutes from "./postactions.route";

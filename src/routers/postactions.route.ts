@@ -1,11 +1,11 @@
 import { Router } from "express";
 import {
-  addComment,
-  deleteComment,
-  dislikePost,
-  likePost,
-  sharePost,
-  unlikePost,
+    addComment,
+    deleteComment,
+    dislikePost,
+    likePost,
+    sharePost,
+    unlikePost,
 } from "../controllers/postactions.controller";
 import { verifyJWT } from "../middlewares/auth";
 

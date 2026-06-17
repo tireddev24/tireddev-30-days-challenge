@@ -1,11 +1,11 @@
 import { Router } from "express";
 import {
-  getUsers,
-  deleteUser,
-  updateUser,
-  verifyEmail,
-  generateOtp,
-  getUserInfo,
+    getUsers,
+    deleteUser,
+    updateUser,
+    verifyEmail,
+    generateOtp,
+    getUserInfo,
 } from "../controllers/user.controller";
 import { verifyJWT } from "../middlewares/auth";
 

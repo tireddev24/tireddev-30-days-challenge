@@ -1,126 +1,148 @@
+import { compareSync, hashSync } from "bcrypt";
 import { Request, Response } from "express";
-import { compareSync, hash } from "bcrypt";
 import { sign } from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 import { JWT_SECRET } from "../secrets";
 import { createOtp, sendMail } from "../utils/helpers";
 
-const prisma = new PrismaClient();
+import prisma from "../lib/prisma";
+import { user } from "../utils/types";
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
-  const { password: userPassword, email } = req.body;
+    const {
+        password: userPassword,
+        email,
+        course,
+        role,
+        username,
+    }: user = req.body;
 
-  try {
-    const userExists = await prisma.users.findFirst({
-      where: { email: email },
-    });
-
-    if (userExists) {
-      res.status(400).json({ success: false, message: "User already exists" });
-      return;
+    if (!userPassword || !email || !course || !role || !username) {
+        res.status(400).json({
+            success: false,
+            message: "All fields are required",
+        });
+        return;
     }
 
-    const user = await prisma.users.create({
-      data: { ...req.body, password: hash(userPassword, 10) },
-    });
+    try {
+        const userExists = await prisma.users.findFirst({
+            where: { email: email },
+        });
 
-    const { password, ...userData } = user;
-    const token = sign({ id: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
+        if (userExists) {
+            res.status(400).json({
+                success: false,
+                message: "User already exists",
+            });
+            return;
+        }
 
-    //create otp after user signs up
-    const otp: string = createOtp();
+        const user = await prisma.users.create({
+            data: { ...req.body, password: hashSync(userPassword, 10) },
+        });
 
-    await prisma.otp.create({
-      data: {
-        otp: otp,
-        usersId: user.id,
-        expiryTime: new Date(Date.now() + 10 * 60 * 1000),
-      },
-    });
+        const { password, ...userData } = user;
+        const token = sign({ id: user.id, email: user.email }, JWT_SECRET, {
+            expiresIn: "1h",
+        });
 
-    sendMail(user.email, otp); //send otp to users mail
+        //create otp after user signs up
+        const otp: string = createOtp();
 
-    res.status(201).json({
-      success: true,
-      message: "User Signed up successfully!",
-      user: userData,
-      token,
-    });
+        await prisma.otp.create({
+            data: {
+                otp: otp,
+                usersId: user.id,
+                expiryTime: new Date(Date.now() + 10 * 60 * 1000),
+            },
+        });
 
-    return;
-  } catch (error: any) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ success: false, message: "Server Error: Unable to signup user" });
-    return;
-  }
+        sendMail(user.email, otp); //send otp to users mail
+
+        res.status(201).json({
+            success: true,
+            message: "User Signed up successfully!",
+            user: userData,
+            token,
+        });
+
+        return;
+    } catch (error: any) {
+        res.status(500).json({ success: false, error });
+        return;
+    }
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {
-  const { email: userEmail, password: userPassword } = req.body;
+    const { email: userEmail, password: userPassword } = req.body;
 
-  try {
-    const user = await prisma.users.findUnique({
-      where: { email: userEmail },
-    });
+    try {
+        const user = await prisma.users.findUnique({
+            where: { email: userEmail },
+        });
 
-    if (!user) {
-      res.status(404).json({ success: false, message: "Invalid Credentials" });
-      return;
+        if (!user) {
+            res.status(404).json({
+                success: false,
+                message: "Invalid Credentials",
+            });
+            return;
+        }
+
+        if (!compareSync(userPassword, user.password)) {
+            res.status(400).json({
+                success: false,
+                message: "Invalid Credentials",
+            });
+            return;
+        }
+
+        const { password, ...userData } = user;
+        const token = sign({ id: user.id, email: user.email }, JWT_SECRET, {
+            expiresIn: "1h",
+        });
+
+        res.cookie("tk", token, {
+            maxAge: 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: "none",
+            secure: true,
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Logged in successfully",
+            user: userData,
+            token,
+        });
+        return;
+    } catch (error: any) {
+        res.status(500).json({ success: false, error });
+        return;
     }
-
-    if (!compareSync(userPassword, user.password)) {
-      res.status(400).json({ success: false, message: "Invalid Credentials" });
-      return;
-    }
-
-    const { password, ...userData } = user;
-    const token = sign({ id: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    res.cookie("tk", token, {
-      maxAge: 60 * 60 * 1000,
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Logged in successfully",
-      user: userData,
-      token,
-    });
-    return;
-  } catch (error: any) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server Error" });
-    return;
-  }
 };
 
 export const logout = async (req: Request, res: Response) => {
-  const userId = req.user!.id;
+    const userId = req.user!.id;
 
-  if (!userId) {
-    res.status(400).json({
-      success: false,
-      message: "You cannot logout while not logged in",
-    });
-    return;
-  }
-  try {
-    res.clearCookie("tk");
+    if (!userId) {
+        res.status(400).json({
+            success: false,
+            message: "You cannot logout while not logged in",
+        });
+        return;
+    }
+    try {
+        res.clearCookie("tk");
 
-    res.status(200).json({ success: true, message: "Logged out successfully" });
-    return;
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: true, message: "Server Error" });
-    return;
-  }
+        res.status(200).json({
+            success: true,
+            message: "Logged out successfully",
+        });
+        return;
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: true, error });
+        return;
+    }
 };

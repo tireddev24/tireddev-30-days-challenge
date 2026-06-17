@@ -48,20 +48,19 @@ STEP 2: Install Dependencies
 
 STEP 3: Configure Environment Variables
 
-1. In the root folder, create a file named ".env" and add the following to the file:
+1.  In the root folder, create a file named ".env" and add the following to the file:
 
-   ```bash
+    ```bash
 
-   PORT = {{your_specified_port}}
-   ```
-
+    PORT = {{your_specified_port}}
+    ```
 
     DATABASE_URL="{{your_postgres_db_connection string}}"
     JWT_SECRET={{your_jwt_secret}}
     IP1=::{{your_current_ip_ddress}}
     IP2=::{{any_other_preferred_ip_address}}
 
-       ```
+        ```
 
 STEP 4: Run The Development Server
 

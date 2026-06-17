@@ -26,5 +26,12 @@ dist-ssr
 .env
 .env.*
 
-__tests__
 
+# Ignore build outputs and dependencies
+dist
+build
+node_modules
+package-lock.json
+
+
+prisma/migrations
