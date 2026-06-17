@@ -15,11 +15,10 @@ A TypeScript-based RESTful backend for a social media application, built with No
 
 ### 🎛️ Tech Stack
 
-- **Node.js** with **TypeScript**
-- **Express.js**
+- **TypeScript**
+- **Express JS**
 - **Prisma ORM**
 - **PostgreSQL**
-- **JWT**
 
 ---
 
